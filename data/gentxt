@@ -1,0 +1,21 @@
+#!/usr/bin/python
+#-*-coding:utf8-*-
+
+import os 
+
+with open('label2.txt','r') as f:
+	text = f.read()
+	dic = text.split(',')
+
+
+files =os.listdir('./val/')
+print(len(files))
+f = open('val_label.txt','w')
+for file  in files:
+	a = file.split('_')[0]
+	f.write(file+' '+a+'\n')
+f.close()
+
+
+
+

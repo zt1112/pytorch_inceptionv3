@@ -1,0 +1,68 @@
+#!/usr/bin/python
+#-*-coding:utf8-*-
+
+__author__ = "buyizhiyou"
+__date__ = "2017-09-22"
+
+'''
+description:生成包含中文字符的图片
+'''
+
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
+from PIL import ImageFilter
+import cv2
+import numpy as np
+import random
+import scipy.stats
+import pdb
+from numpy import (amax, amin, array, bitwise_and, clip, dtype, mean, minimum,
+                   nan, sin, sqrt, zeros,random,dot)
+from scipy.ndimage import filters,measurements,interpolation
+
+
+def _gen_image(h,w,b1,a1,fontsize,j,i,word):
+    font_path = './fonts/FZSong-YS01.ttf'
+    img = Image.new("RGB", (w, h), (255,255,255))#新建Img,白背景
+    draw = ImageDraw.Draw(img)#获得可绘制对象
+    font = ImageFont.truetype(font_path, fontsize)#字体设置
+    draw.text((w*a1, h*b1), unicode(word,'utf8'), (0,0,0),font=font)#绘制字，黑体字
+    img.save('./origin/'+str(j)+'_'+str(i)+'.png','png')
+    img = cv2.imread('./origin/'+str(j)+'_'+str(i)+'.png',0)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(3,3)) 
+    img = cv2.erode(img,kernel)
+    for m in range(200):
+        t = random.randint(0,h-1)
+        s = random.randint(0,w-1)
+        img[t:t+3,s:s+3] = 255 #随即撒白点，模拟光照不均匀
+    # img = cv2.resize(img,(224,224))
+    #img = _add_noise(img)
+    cv2.imwrite('./val/'+str(j)+'_'+str(i)+'.png',img)
+ 
+
+
+with open('label2.txt','r') as f:
+    text = f.read()
+    dic = text.split(',')
+    print(len(dic))
+#每个汉字生成1000张  
+for j in range(len(dic)):
+    for i in range(100):
+        h = random.randint(65,80)
+        w = random.randint(65,80)
+        a1 = random.uniform(0.05,0.1)
+        b1 = random.uniform(0.05,0.1)
+        t = random.uniform(0.85,1-b1)*h
+        s = random.uniform(0.85,1-a1)*w
+        fontsize = int(min(t,s))
+        print(str(len(dic))+':'+str(j))
+        _gen_image(h,w,b1,a1,fontsize,j,i,dic[j])
+
+
+
+
+
+
+
+
